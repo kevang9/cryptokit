@@ -1,4 +1,4 @@
-module cryptokit
+module github.com/wagner-aos/cryptokit
 
 go 1.13
 
