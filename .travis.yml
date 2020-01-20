@@ -1,0 +1,9 @@
+language: go
+
+go:
+  - 1.8
+
+script:
+  - make test
+  - $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+
