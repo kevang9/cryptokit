@@ -1,67 +1,75 @@
 package dukpt
 
 import (
+	"crypto/cipher"
+	"crypto/des"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-var Bdk = []byte{0xE0, 0x89, 0x06, 0x48, 0x9D, 0x14, 0x4C, 0x6C, 0x61, 0xD0, 0x2E, 0xCA, 0x20, 0xF9, 0xD2, 0x36}
-var KSN = []byte{0x50, 0x4F, 0x53, 0x30, 0x32, 0x00, 0x00, 0x20, 0x00, 0x01}
-var KSN10 = []byte{0x50, 0x4F, 0x53, 0x30, 0x32, 0x00, 0x00, 0x20, 0x01, 0x00}
-var Ipek = []byte{0x30, 0x85, 0x98, 0xd6, 0xdf, 0xeb, 0x67, 0x24, 0x09, 0xa1, 0x42, 0x06, 0x90, 0xe4, 0x96, 0x2a}
-var Pek = []byte{0xdc, 0xd8, 0xcd, 0x6c, 0x5f, 0x2e, 0xcb, 0xc7, 0xfd, 0xe7, 0x24, 0xcb, 0xa1, 0x4b, 0x65, 0x90}
+var BDK = []byte("4C98CEC85D5280D0CB138C6B4598D03D")
+var KSN = []byte("504F5330320000200014")
+var IPEK = []byte("e08906489d144c6c61d02eca20f9d236")
+var PEK = []byte("ba4926a9a393d45e0b30f42f379cb968")
 
-//WagnerAOS
-var PlainText = []byte{0x57, 0x61, 0x67, 0x6E, 0x65, 0x72, 0x41, 0x4F, 0x53, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+var PlainText = []byte("PAN0165502094004663386TR20375502094004663386=27082060000076100000DTV0042708CVV000FFFFFFF")
+var CypherText = []byte("7c1fb70b3ee4f3518d8f8962261f1a384ebb7cd7372f3e11bc186711c9f1ef62fb38e9eddcb200a636fba82ac1f5e4789105e4cb641e6362be5902b29f6013db24c12acae7bac2d35554fa3790f34d224c93db9fa0b4c2bd")
 
-//var Ciphertext = []byte{0xC2, 0x5C, 0x1D, 0x11, 0x97, 0xD3, 0x1C, 0xAA, 0x87, 0x28, 0x5D, 0x59, 0xA8, 0x92, 0x04, 0x74, 0x26, 0xD9, 0x18, 0x2E, 0xC1, 0x13, 0x53, 0xC0, 0x51, 0xAD, 0xD6, 0xD0, 0xF0, 0x72, 0xA6, 0xCB, 0x34, 0x36, 0x56, 0x0B, 0x30, 0x71, 0xFC, 0x1F, 0xD1, 0x1D, 0x9F, 0x7E, 0x74, 0x88, 0x67, 0x42, 0xD9, 0xBE, 0xE0, 0xCF, 0xD1, 0xEA, 0x10, 0x64, 0xC2, 0x13, 0xBB, 0x55, 0x27, 0x8B, 0x2F, 0x12}
+func TestFullDukptFlow3DESCbcEncrypt(t *testing.T) {
 
-func TestFullDukptFlow(t *testing.T) {
+	//Input Keys
+	bdk := convertByteArrayToHexArray(BDK)
+	ksn := convertByteArrayToHexArray(KSN)
 
-	tdes := false
-	key := []byte("")
+	//Derive
+	ipek, _ := DeriveIpekFromBdk(bdk, ksn)
+	pek, _ := DerivePekFromIpek(ipek, ksn)
 
-	ipek, _ := DeriveIpekFromBdk(Bdk, KSN)
-	pek, _ := DerivePekFromIpek(Ipek, KSN)
-	pek10, _ := DerivePekFromIpek(pek, KSN10)
-
-	assert.Equal(t, ipek, Ipek, "Derived IPEK should be correct")
-	assert.Equal(t, pek, Pek, "Derived PEK should be correct")
-
-	t.Logf("BDK: %x", Bdk)
-	t.Logf("KSN: %x", KSN)
+	t.Logf("BDK: %x", bdk)
+	t.Logf("KSN: %x", ksn)
 	t.Logf("IPEK: %x", ipek)
 	t.Logf("PEK: %x", pek)
-	t.Logf("PEK10: %x", pek10)
 
-	plainText := []byte("WagnerAOS")
-	//hexText := []byte("5761676E6572414F5300000000000000")
-	//key := []byte("BBF47BAC9F09FF312BE2DB35DC73C58A")
+	assert.Equal(t, ipek, convertByteArrayToHexArray(IPEK), "Derived IPEK should be correct")
+	assert.Equal(t, pek, convertByteArrayToHexArray(PEK), "Derived PEK should be correct")
 
-	//TDES Key
-	//tdesKey := buildTdesKey(pek)
-	if tdes {
-		key = buildTdesKey(pek)
-	} else {
-		key = pek
+	tdes, _ := des.NewTripleDESCipher(buildTdesKey(pek))
+	cbc := cipher.NewCBCEncrypter(tdes, make([]byte, 8))
+
+	result := make([]byte, len(CypherText))
+	cbc.CryptBlocks(result, PlainText)
+
+	t.Logf("ENCRYPTED: %x", string(result))
+
+	assert.Equal(t, "7c1fb70b3ee4f3518d8f8962261f1a384ebb7cd7372f3e11bc186711c9f1ef62fb38e9eddcb200a636fba82ac1f5e4789105e4cb641e6362be5902b29f6013db24c12acae7bac2d35554fa3790f34d224c93db9fa0b4c2bd00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", fmt.Sprintf("%x", string(result)))
+
+}
+
+func TestFullDukptFlow3DESCbcDecrypt(t *testing.T) {
+
+	bdk := convertByteArrayToHexArray(BDK)
+	ksn := convertByteArrayToHexArray(KSN)
+	pek, _ := DerivePekFromBdk(bdk, ksn)
+
+	t.Logf("BDK: %x", bdk)
+	t.Logf("KSN: %x", ksn)
+	t.Logf("PEK: %x", pek)
+
+	assert.Equal(t, pek, convertByteArrayToHexArray(PEK), "Derived PEK should be correct")
+	assert.NotNil(t, pek)
+
+	tdes, err := des.NewTripleDESCipher(buildTdesKey(pek))
+	if err != nil {
+		t.Logf("ERR: %s", err)
 	}
+	cbc := cipher.NewCBCDecrypter(tdes, make([]byte, 8))
 
-	//ENCRYPTION
-	//encryptedText := []byte("A10675857A6D01C08A3F71C449EAC96A9AE0F4499A06937C29EEA532D291D13EECB120E87B0BC03D90831890F611E764258C7297921C095E4160C4BB9ABF9430331D97677846D4B7AA1D35FDDEEF2DC46AE895252EA55659")
-	encryptedText := EncryptDecryptAes128Ecb(PlainText, key, true)
+	result := make([]byte, len(PlainText))
+	cbc.CryptBlocks(result, convertByteArrayToHexArray(CypherText))
 
-	//DECRYPTION
-	decryptedText := EncryptDecryptAes128Ecb(encryptedText, key, false)
+	t.Logf("DECRYPTED: %x", string(result))
 
-	t.Logf("TDES: %t", tdes)
-	t.Logf("KEY: %x", key)
-	t.Logf("plainText: %s", plainText)
-	t.Logf("hexText: %x", PlainText)
-	t.Logf("decriptedText: %s", decryptedText)
-	t.Logf("encriptedText: %x", encryptedText)
-
-	assert.Equal(t, decryptedText, "")
-	//assert.Equal(t, decryptedText, hexText)
-
+	assert.Equal(t, "PAN0165502094004663386TR20375502094004663386=27082060000076100000DTV0042708CVV000FFFFFFF", fmt.Sprintf("%s", string(result)))
 }

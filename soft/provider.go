@@ -7,7 +7,7 @@ import (
 	"os"
 	"path"
 
-	"cryptokit"
+	"github.com/wagner-aos/cryptokit"
 )
 
 type Provider struct {

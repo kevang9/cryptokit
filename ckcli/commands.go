@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cryptokit"
+	"github.com/wagner-aos/cryptokit"
 	"fmt"
 	"reflect"
 )

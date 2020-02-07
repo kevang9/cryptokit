@@ -2,7 +2,7 @@ package soft
 
 import (
 	"encoding/hex"
-	"cryptokit"
+	"github.com/wagner-aos/cryptokit"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"

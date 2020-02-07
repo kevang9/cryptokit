@@ -1,9 +1,9 @@
 package main
 
 import (
-	"cryptokit"
 	"errors"
 	"fmt"
+	"github.com/wagner-aos/cryptokit"
 	"io"
 	"os"
 
@@ -215,7 +215,7 @@ Options:
 	-h --help	Show this text.
 	--version	Show version.`
 
-	args, err := docopt.Parse(usage, nil, true, "Cryptokit", false)
+	args, err := docopt.Parse(usage, nil, true, "github.com/wagner-aos/cryptokit", false)
 
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)

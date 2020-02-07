@@ -6,7 +6,7 @@ import (
 	"crypto/cipher"
 	"crypto/des"
 	"crypto/hmac"
-	"cryptokit"
+	"github.com/wagner-aos/cryptokit"
 	"errors"
 )
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"crypto/rand"
-	"cryptokit/soft/dukpt"
+	"github.com/wagner-aos/cryptokit/soft/dukpt"
 	"encoding/hex"
 	"errors"
 	"fmt"

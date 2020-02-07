@@ -1,7 +1,7 @@
 package soft
 
 import (
-	"cryptokit"
+	"github.com/wagner-aos/cryptokit"
 	"encoding/base64"
 	"errors"
 )

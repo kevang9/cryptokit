@@ -2,8 +2,8 @@ package soft
 
 import (
 	"crypto/rand"
-	"cryptokit"
-	"cryptokit/soft/dukpt"
+	"github.com/wagner-aos/cryptokit"
+	"github.com/wagner-aos/cryptokit/soft/dukpt"
 	"errors"
 )
 

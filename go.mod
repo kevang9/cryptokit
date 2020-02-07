@@ -11,5 +11,6 @@ require (
 	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
 	github.com/fatih/camelcase v1.0.0
 	github.com/hashicorp/vault/api v1.0.4
+	github.com/stretchr/testify v1.3.0
 	github.com/tucnak/climax v0.0.0-20180716104603-da4c02f3b1f8
 )
