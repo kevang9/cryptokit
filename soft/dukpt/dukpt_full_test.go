@@ -35,7 +35,7 @@ func TestFullDukptFlow3DESCbcEncrypt(t *testing.T) {
 	assert.Equal(t, ipek, convertByteArrayToHexArray(IPEK), "Derived IPEK should be correct")
 	assert.Equal(t, pek, convertByteArrayToHexArray(PEK), "Derived PEK should be correct")
 
-	tdes, _ := des.NewTripleDESCipher(buildTdesKey(pek))
+	tdes, _ := des.NewTripleDESCipher(BuildTdesKey(pek))
 	cbc := cipher.NewCBCEncrypter(tdes, make([]byte, 8))
 
 	result := make([]byte, len(CypherText))
@@ -60,7 +60,7 @@ func TestFullDukptFlow3DESCbcDecrypt(t *testing.T) {
 	assert.Equal(t, pek, convertByteArrayToHexArray(PEK), "Derived PEK should be correct")
 	assert.NotNil(t, pek)
 
-	tdes, err := des.NewTripleDESCipher(buildTdesKey(pek))
+	tdes, err := des.NewTripleDESCipher(BuildTdesKey(pek))
 	if err != nil {
 		t.Logf("ERR: %s", err)
 	}

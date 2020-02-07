@@ -69,7 +69,7 @@ func TestDecryption(t *testing.T) {
 	assert.NotNil(t, pek)
 	assert.Equal(t, testPek, pek, "Derived PEK should be correct")
 
-	tdes, _ := des.NewTripleDESCipher(buildTdesKey(pek))
+	tdes, _ := des.NewTripleDESCipher(BuildTdesKey(pek))
 	cbc := cipher.NewCBCDecrypter(tdes, make([]byte, 8))
 
 	result := make([]byte, len(testCiphertext))
