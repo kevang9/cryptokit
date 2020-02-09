@@ -190,7 +190,7 @@ func encryptRegister(dst, curkey, reg8 []byte) error {
 	return nil
 }
 
-func buildTdesKey(key []byte) []byte {
+func BuildTdesKey(key []byte) []byte {
 	var finalKey []byte
 
 	if len(key) == 24 {
@@ -205,7 +205,7 @@ func buildTdesKey(key []byte) []byte {
 }
 
 func tdesEncrypt(dst, data, key []byte) error {
-	block, err := des.NewTripleDESCipher(buildTdesKey(key))
+	block, err := des.NewTripleDESCipher(BuildTdesKey(key))
 
 	if err != nil {
 		return err
